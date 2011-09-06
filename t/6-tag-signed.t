@@ -11,7 +11,11 @@ use File::Path qw{ make_path };
 use Git::Wrapper;
 use Path::Class;
 use File::Which qw{ which };
-use Test::More   tests => 7;
+use Test::More;
+
+which('gpg')
+    ? plan tests => 7
+    : plan skip_all => q{gpg couldn't be located in $PATH; required for GPG-signed tags};
 
 # Mock HOME to avoid ~/.gitexcludes from causing problems
 $ENV{HOME} = tempdir( CLEANUP => 1 );
@@ -21,7 +25,7 @@ cp 'dzp-git.sec', "$ENV{HOME}/.gnupg/secring.gpg";
 
 # build fake repository
 my $zilla = Dist::Zilla::Tester->from_config({
-  dist_root => dir(qw(t tag-signed)),
+    dist_root => dir(qw(t tag-signed)),
 });
 
 chdir $zilla->tempdir->subdir('source');
